@@ -1,4 +1,4 @@
-export default class Drawflow {
+class Drawflow {
   constructor(container, render = null, parent = null) {
     this.events = {};
     this.container = container;
@@ -1958,3 +1958,5 @@ export default class Drawflow {
         return uuid;
     }
 }
+
+window.Drawflow = Drawflow;

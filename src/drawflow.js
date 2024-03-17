@@ -1471,24 +1471,31 @@ export default class Drawflow {
   }
 
   updateNodeValue(event) {
-    var attr = event.target.attributes
-    for (var i = 0; i < attr.length; i++) {
-            if (attr[i].nodeName.startsWith('df-')) {
-                var keys = attr[i].nodeName.slice(3).split("-");
-                var target = this.drawflow.drawflow[this.module].data[event.target.closest(".drawflow_content_node").parentElement.id.slice(5)].data;
-                for (var index = 0; index < keys.length - 1; index += 1) {
-                    if (target[keys[index]] == null) {
-                        target[keys[index]] = {};
-                    }
-                    target = target[keys[index]];
-                }
-                target[keys[keys.length - 1]] = event.target.value;
-                if(event.target.isContentEditable) {
-                  target[keys[keys.length - 1]] = event.target.innerText;
-                }
-                this.dispatch('nodeDataChanged', event.target.closest(".drawflow_content_node").parentElement.id.slice(5));
-          }
-    }
+    const targetElement = event.target;
+    const dfAttributes = Array.from(targetElement.attributes).filter(attr => attr.nodeName.startsWith('df-'));
+  
+    dfAttributes.forEach(attr => {
+      const keys = attr.nodeName.slice(3).split("-");
+      let targetData = this.drawflow.drawflow[this.module].data[targetElement.closest(".drawflow_content_node").parentElement.id.slice(5)].data;
+  
+      // Navigate through the nested structure, creating objects if necessary
+      keys.slice(0, -1).forEach(key => {
+        targetData[key] = targetData[key] || {};
+        targetData = targetData[key];
+      });
+  
+      // Determine the value based on input type
+      const valueKey = keys[keys.length - 1];
+      if (targetElement.type === 'checkbox') {
+        targetData[valueKey] = targetElement.checked;
+      } else if (targetElement.isContentEditable) {
+        targetData[valueKey] = targetElement.innerText;
+      } else {
+        targetData[valueKey] = targetElement.value;
+      }
+  
+      this.dispatch('nodeDataChanged', targetElement.closest(".drawflow_content_node").parentElement.id.slice(5));
+    });
   }
 
   updateNodeDataFromId(id, data) {

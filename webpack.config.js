@@ -1,5 +1,5 @@
 module.exports = {
-  entry: './src/drawflow.js',
+  entry: './src/johnflow.js',
   output: {
     library: 'Drawflow',
     libraryTarget: 'umd',
